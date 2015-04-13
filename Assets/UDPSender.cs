@@ -10,9 +10,12 @@ public class UDPSender : MonoBehaviour {
     bool connectionStarted;
 
     int remotePort = 19784;
+    string myIP;
+    public string peerIP;
 
     void Start()
     {
+        myIP = Network.player.ipAddress;
         sender = new UdpClient(25000, AddressFamily.InterNetwork);
         IPEndPoint groupEP = new IPEndPoint(IPAddress.Broadcast, remotePort);
         sender.Connect(groupEP);
@@ -20,7 +23,7 @@ public class UDPSender : MonoBehaviour {
 
     void SendData()
     {
-        string customMessage = Network.player.ipAddress + " * " + "VR";
+        string customMessage = myIP + " connectVR";
 
         if (customMessage != "")
         {
@@ -72,5 +75,11 @@ public class UDPSender : MonoBehaviour {
         receiver.BeginReceive(new AsyncCallback(ReceiveData), null);
         string receivedString = Encoding.ASCII.GetString(received);
         print(receivedString);
+        string[] filteredString = receivedString.Split();
+        print(filteredString[0]);
+        if (filteredString[0] != myIP)
+        {
+            peerIP = filteredString[0];
+        }
     }
 }
