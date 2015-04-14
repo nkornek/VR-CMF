@@ -1,10 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
-using System;
-using System.Text;
+using UnityEngine.UI;
 
-public class TakeData : MonoBehaviour {
-    public Byte[] data;
+public class ConnectionInfo : MonoBehaviour {
+    public Text UI;
 
 	// Use this for initialization
 	void Start () {
@@ -13,8 +12,7 @@ public class TakeData : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-
-        
+        UI.text = "Connected Users: " + Network.connections.Length;
 	
 	}
 }
