@@ -6,14 +6,29 @@ using System.Text;
 using System;
 
 public class UDPSender : MonoBehaviour {
+    public static UDPSender networkManager;
+
     UdpClient sender;
-    bool connectionStarted, connected, isHost;
+    public bool connectionStarted, connected, isHost;
 
     int remotePort = 19784;
     int serverPort = 2500;
     string myIP;
     public string gameName, peerIP;
     public int maxConnections;
+
+    void Awake()
+    {
+        DontDestroyOnLoad(gameObject);
+        if (networkManager == null)
+        {
+            networkManager = this;
+        }
+        else if (networkManager != this)
+        {
+            Destroy(gameObject);
+        }
+    }
 
     void Start()
     {
