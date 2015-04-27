@@ -17,6 +17,7 @@ public class UDPSender : MonoBehaviour {
     public string gameName, peerIP;
     public int maxConnections;
 
+    //singleton and carryover to keep network connection active
     void Awake()
     {
         DontDestroyOnLoad(gameObject);
@@ -45,6 +46,7 @@ public class UDPSender : MonoBehaviour {
             connectionStarted = true;
             Network.Connect(peerIP, serverPort);
             Debug.Log("trying connection");
+            CancelInvoke("CheckIfServer");
         }
 
         //stop broadcasting IP once maximun number of connections have been made
@@ -65,17 +67,23 @@ public class UDPSender : MonoBehaviour {
      * Connect listens for the IP + ID string and filters it out
      * If it finds a match, it will connect to the server
     */
-    public void Host()
-    {
-        CancelInvoke("SendData");
-        isHost = true;
-        Network.InitializeServer(32, serverPort, false);
-        InvokeRepeating("SendData", 0, 2f);
-    }
 
     public void Connect()
     {
         StartReceivingIP();
+        Invoke("CheckIfServer", 5);
+    }
+
+    //start server if there is none
+    void CheckIfServer()
+    {
+        if (peerIP == "")
+        {
+            isHost = true;
+            Network.InitializeServer(32, serverPort, false);
+            SendData();
+            InvokeRepeating("SendData", 0, 0.5f);
+        }
     }
 
 
@@ -121,7 +129,7 @@ public class UDPSender : MonoBehaviour {
         {
             return;
         }
-        receiver.BeginReceive(new AsyncCallback(ReceiveData), null);
+        
         string receivedString = Encoding.ASCII.GetString(received);
         Debug.Log(receivedString);
         string[] filteredString = receivedString.Split();
@@ -130,6 +138,10 @@ public class UDPSender : MonoBehaviour {
         if (filteredString[0] != myIP && filteredString[1] == gameName)
         {
             peerIP = filteredString[0];
+        }
+        else if (!isHost)
+        {
+            receiver.BeginReceive(new AsyncCallback(ReceiveData), null);
         }
     }
 

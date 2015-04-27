@@ -2,13 +2,13 @@
 using System.Collections;
 
 public class GameStartNetwork : MonoBehaviour {
-    public GameObject toSpawn;
+    public GameObject toSpawnClient;
 
 	// Use this for initialization
 	void Start () {
-        if (UDPSender.networkManager.isHost)
+        if (Network.isClient)
         {
-            Network.Instantiate(toSpawn, Vector3.zero, Quaternion.identity, 0);
+            Network.Instantiate(toSpawnClient, Vector3.zero, Quaternion.identity, 0);
         }
 	
 	}
